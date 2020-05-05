@@ -211,13 +211,13 @@ impl<'a> SenseHat<'a> {
     }
 
     /// Get the compass heading (ignoring gyro and magnetometer)
-    pub fn get_compass(&mut self) -> SenseHatResult<Angle> {
+    pub fn get_compass(&mut self) -> SenseHatResult<Vector3D> {
         self.accelerometer_chip.set_compass_only();
         if self.accelerometer_chip.imu_read() {
             // Don't cache this data
             let data = self.accelerometer_chip.get_imu_data()?;
-            match data.fusion_pose {
-                Some(o) => Ok(o.yaw),
+            match data.compass {
+                Some(o) => Ok(o),
                 None => Err(SenseHatError::NotReady),
             }
         } else {
@@ -227,11 +227,11 @@ impl<'a> SenseHat<'a> {
 
     /// Returns a vector representing the current orientation using only
     /// the gyroscope.
-    pub fn get_gyro(&mut self) -> SenseHatResult<Orientation> {
+    pub fn get_gyro(&mut self) -> SenseHatResult<Vector3D> {
         self.accelerometer_chip.set_gyro_only();
         if self.accelerometer_chip.imu_read() {
             let data = self.accelerometer_chip.get_imu_data()?;
-            match data.fusion_pose {
+            match data.gyro {
                 Some(o) => Ok(o),
                 None => Err(SenseHatError::NotReady),
             }
